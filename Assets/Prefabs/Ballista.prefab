@@ -46,7 +46,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 14501ffff372ccc4680aad5750472aee, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  towerCost: 50
+  towerCost: 75
 --- !u!114 &-7559142224254614627
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -61,7 +61,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   weapon: {fileID: 3144582324300694500}
   projectile: {fileID: 3329349102604971543}
-  towerRange: 4.99
+  towerRange: 3
 --- !u!1 &5809996699799796317
 GameObject:
   m_ObjectHideFlags: 0
@@ -230,7 +230,7 @@ ParticleSystem:
     startSpeed:
       serializedVersion: 2
       minMaxState: 0
-      scalar: 5
+      scalar: 8
       minScalar: 5
       maxCurve:
         serializedVersion: 2

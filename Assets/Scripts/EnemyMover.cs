@@ -14,7 +14,7 @@ public class EnemyMover : MonoBehaviour
     {
         FindPath();
         ReturnStart();
-        StartCoroutine(moveWaypoint());
+        StartCoroutine(moveToWaypoint());
     }
 
     // Update is called once per frame
@@ -33,7 +33,7 @@ public class EnemyMover : MonoBehaviour
         transform.position = path[0].transform.position;
     }
 
-    IEnumerator moveWaypoint()
+    IEnumerator moveToWaypoint()
     {
         foreach (Waypoint waypoint in path)
         {
