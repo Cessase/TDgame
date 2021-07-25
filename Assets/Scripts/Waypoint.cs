@@ -6,26 +6,45 @@ using UnityEngine;
 public class Waypoint : MonoBehaviour
 {
     [SerializeField] private Tower tower;
-    
     [SerializeField] private bool isPlaceable;
 
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    } 
-
+    private GridManager gridManager;
+    private Vector2Int coordinates = new Vector2Int();
+    private PathFinding pathFinder;
     public bool IsPlaceable
     {
         get => isPlaceable;
-        set => isPlaceable = value;
     }
+
+    private void Awake()
+    {
+        gridManager = FindObjectOfType<GridManager>();
+        pathFinder = FindObjectOfType<PathFinding>();
+    }
+
+    private void Start()
+    {
+        if (gridManager != null)
+        {
+            coordinates = gridManager.GetCoordinatesFromPosition(transform.position);
+
+            if (!isPlaceable)
+            {
+                gridManager.BlockedNode(coordinates);
+            }
+        }
+    }
+
     private void OnMouseDown()
     {
-        if (isPlaceable)
+        if (gridManager.GetNode(coordinates).isWalkable && !pathFinder.WillBlockPath(coordinates))
         {
-            bool isPlaced = tower.createTower(tower, transform.position);
-            isPlaceable = isPlaced;
+            bool isSuccessful = tower.createTower(tower, transform.position);
+            if (isSuccessful)
+            {
+                gridManager.BlockedNode(coordinates);
+                pathFinder.NotifyReceivers();
+            }
         }
     }
 

@@ -11,17 +11,19 @@ public class Coordinate : MonoBehaviour
     // Start is called before the first frame update
      private Color defaultColor = Color.white;
      private Color blockedColor = Color.gray;
+     private Color exploredColor = Color.yellow;
+     private Color pathColor = new Color(1f,0.5f,0f);
      
     private TextMeshPro label;
-    private Vector2Int coordinates;
-    private Waypoint waypoint;
+    private Vector2Int coordinates = new Vector2Int();
+    private GridManager gridManager;
     
     private void Awake()
     {
+        gridManager = FindObjectOfType<GridManager>();
         label = GetComponent<TextMeshPro>();
         label.enabled = false;
         
-        waypoint = GetComponentInParent<Waypoint>();
         DisplayCoordinates();
     }
     
@@ -40,13 +42,27 @@ public class Coordinate : MonoBehaviour
 
     void SetLabelColor()
     {
-        if (waypoint.IsPlaceable)
+        if (gridManager == null) { return; }
+
+        Node node = gridManager.GetNode(coordinates);
+        
+        if (node == null) { return; }
+
+        if (!node.isWalkable)
         {
-            label.color = defaultColor;
+            label.color = blockedColor;
+        }
+        else if (node.isPath)
+        {
+            label.color = pathColor;
+        }
+        else if (node.isExplored)
+        {
+            label.color = exploredColor;
         }
         else
         {
-            label.color = blockedColor;
+            label.color = defaultColor;
         }
     }
 
@@ -61,8 +77,10 @@ public class Coordinate : MonoBehaviour
     
     void DisplayCoordinates()
     {
-        coordinates.x = Mathf.RoundToInt(transform.parent.position.x / UnityEditor.EditorSnapSettings.move.x);
-        coordinates.y = Mathf.RoundToInt(transform.parent.position.z / UnityEditor.EditorSnapSettings.move.z);
+        if (gridManager == null) { return; }
+        
+        coordinates.x = Mathf.RoundToInt(transform.parent.position.x / gridManager.UnityGridSize);
+        coordinates.y = Mathf.RoundToInt(transform.parent.position.z / gridManager.UnityGridSize);
         
         label.text = coordinates.x  + "," + coordinates.y;
     }

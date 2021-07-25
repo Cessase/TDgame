@@ -5,17 +5,11 @@ using UnityEngine;
 public class Tower : MonoBehaviour
 {
     [SerializeField] private int towerCost;
+    [SerializeField] private float buildDelay = 1f;
     
-    // Start is called before the first frame update
     void Start()
     {
-        
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
+        StartCoroutine(BuildTower());
     }
 
     public bool createTower(Tower tower, Vector3 position)
@@ -32,5 +26,27 @@ public class Tower : MonoBehaviour
 
         return false;
 
+    }
+
+    IEnumerator BuildTower()
+    {
+        foreach (Transform child in transform)
+        {
+            gameObject.SetActive(false);
+            foreach (Transform grandchild in child)
+            {
+                gameObject.SetActive(false);
+            }
+        }
+        foreach (Transform child in transform)
+        {
+            gameObject.SetActive(true);
+            yield return new WaitForSeconds(buildDelay);
+            foreach (Transform grandchild in child)
+            {
+                gameObject.SetActive(true);
+            }
+        }
+        
     }
 }

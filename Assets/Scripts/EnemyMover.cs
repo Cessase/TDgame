@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -5,40 +6,38 @@ using UnityEngine;
 [RequireComponent(typeof(Enemy))]
 public class EnemyMover : MonoBehaviour
 {
-    [SerializeField] private List<Waypoint> path = new List<Waypoint>();
     [SerializeField] [Range(0f,5f)] private float speed = 1f;
 
     private Enemy enemy;
+    private GridManager gridManager;
+    private PathFinding pathFinder;
+    private List<Node> path = new List<Node>();
     // Start is called before the first frame update
     void OnEnable()
     {
-        FindPath();
         ReturnStart();
-        StartCoroutine(moveToWaypoint());
+        RecalculatePath(true);
+        
     }
 
-    // Update is called once per frame
-
-    void Start()
+    private void Awake()
     {
         enemy = GetComponent<Enemy>();
-    }
-    void Update()
-    {
-        
+        gridManager = FindObjectOfType<GridManager>();
+        pathFinder = FindObjectOfType<PathFinding>();
     }
 
     void ReturnStart()
     {
-        transform.position = path[0].transform.position;
+        transform.position = gridManager.GetPositionFromCoordinates(pathFinder.StartCoordinates);
     }
 
     IEnumerator moveToWaypoint()
     {
-        foreach (Waypoint waypoint in path)
+        for(int i = 1; i < path.Count; i++)
         {
             Vector3 startPosition = transform.position;
-            Vector3 endPosition = waypoint.transform.position;
+            Vector3 endPosition = gridManager.GetPositionFromCoordinates(path[i].coordinates);
             float travelPercent = 0f;
             
             transform.LookAt(endPosition);
@@ -60,19 +59,22 @@ public class EnemyMover : MonoBehaviour
         enemy.StealGold();
     }
 
-    void FindPath()
+    void RecalculatePath(bool resetPath)
     {
-        path.Clear();
-        GameObject waypoints = GameObject.FindGameObjectWithTag("Path");
+        Vector2Int coordinates = new Vector2Int();
 
-        foreach (Transform child in waypoints.transform)
+        if (resetPath)
         {
-            Waypoint waypoint = child.GetComponent<Waypoint>();
-            
-            if (child != null)
-            {
-                path.Add(waypoint);
-            }
+            coordinates = pathFinder.StartCoordinates;
         }
+        else
+        {
+            coordinates = gridManager.GetCoordinatesFromPosition(transform.position);
+        }
+        StopAllCoroutines();
+        path.Clear();
+        path = pathFinder.GetNewPath(coordinates);
+        
+        StartCoroutine(moveToWaypoint());
     }
 }
